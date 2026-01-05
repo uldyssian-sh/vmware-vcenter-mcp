@@ -65,7 +65,7 @@ class TestModuleImports:
         # Only test what we can import without dependencies
         try:
             import vmware_vcenter_mcp
-            assert vmware_vcenter_mcp.__version__ == "1.0.0"
+            assert vmware_vcenter_mcp.__version__ == "1.5.0"
             assert vmware_vcenter_mcp.__author__ == "uldyssian-sh"
         except ImportError:
             # Skip if dependencies are not available

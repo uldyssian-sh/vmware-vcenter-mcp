@@ -123,7 +123,7 @@ Examples:
     parser.add_argument(
         "--version", "-v",
         action="version",
-        version="VMware vCenter MCP Server 1.0.0"
+        version="VMware vCenter MCP Server 1.5.0"
     )
     
     args = parser.parse_args()
@@ -133,7 +133,7 @@ Examples:
     
     # Print startup banner
     print("=" * 60)
-    print("VMware vCenter MCP Server v1.0.0")
+    print("VMware vCenter MCP Server v1.5.0")
     print("Enterprise virtualization management via MCP")
     print("Author: uldyssian-sh")
     print("=" * 60)

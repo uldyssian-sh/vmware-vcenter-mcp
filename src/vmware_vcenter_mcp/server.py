@@ -795,7 +795,7 @@ class VCenterMCPServer:
                     write_stream,
                     InitializationOptions(
                         server_name="vmware-vcenter-mcp",
-                        server_version="1.0.0",
+                        server_version="1.5.0",
                         capabilities=self.server.get_capabilities(
                             notification_options=None,
                             experimental_capabilities=None

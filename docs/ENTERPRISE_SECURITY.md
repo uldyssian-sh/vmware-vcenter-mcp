@@ -301,7 +301,7 @@ config_manager = create_protected_config_manager(
 app_config = {
     "mcp_server": {
         "name": "VMware vCenter MCP Server",
-        "version": "1.6.0",
+        "version": "1.5.0",
         "environment": "production"
     },
     "logging": {
