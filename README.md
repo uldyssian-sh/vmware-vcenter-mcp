@@ -9,8 +9,6 @@ An enterprise-grade Model Context Protocol (MCP) server for comprehensive VMware
 
 ## Features
 
-## Features
-
 ### Core MCP Tools
 - **Datacenter Operations**: Multi-datacenter management and orchestration
 - **Cluster Management**: DRS, HA, vMotion configuration and monitoring
