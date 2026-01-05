@@ -2,7 +2,7 @@
 # Note: In production, install only required packages based on your needs
 
 # Basic Python utilities
-pyyaml>=6.0
+pyyaml>=6.0.2
 python-dotenv>=1.0.0
 requests>=2.28.0
 
