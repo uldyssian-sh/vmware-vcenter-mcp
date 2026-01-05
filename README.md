@@ -9,33 +9,42 @@ An enterprise-grade Model Context Protocol (MCP) server for comprehensive VMware
 
 ## Features
 
-### vCenter Management
+## Features
+
+### Core MCP Tools
 - **Datacenter Operations**: Multi-datacenter management and orchestration
 - **Cluster Management**: DRS, HA, vMotion configuration and monitoring
+- **VM Lifecycle**: Complete virtual machine lifecycle management
 - **Resource Pools**: Dynamic resource allocation and management
-- **Distributed Switches**: Advanced networking configuration
 - **Storage Management**: vSAN, VMFS, NFS, and iSCSI operations
+- **Network Management**: Distributed switches and advanced networking
+- **Template Operations**: Enterprise template deployment and customization
+- **Snapshot Management**: Enterprise snapshot management and consolidation
+- **Performance Monitoring**: Real-time metrics and analytics
+- **Automation Workflows**: Complex workflow orchestration
 
-### Advanced Virtualization
-- **VM Templates**: Template creation, deployment, and lifecycle management
-- **Snapshots**: Enterprise snapshot management and consolidation
-- **vMotion Operations**: Live migration and load balancing
-- **High Availability**: Automated failover and recovery
-- **Distributed Resource Scheduler**: Intelligent workload placement
+### Enterprise Architecture
+- **Multi-Tenancy**: Complete tenant isolation with resource quotas and RBAC
+- **High Availability**: Active-active clustering with automatic failover and load balancing
+- **Enterprise Security**: Advanced threat detection, encryption, and compliance management
+- **Authentication**: LDAP, SAML, OAuth2, and multi-factor authentication support
+- **Authorization**: Fine-grained RBAC with role-based permissions and tenant isolation
+- **Monitoring**: Comprehensive observability with Prometheus metrics, health checks, and audit logging
+- **Orchestration**: Workflow automation engine with complex task dependencies and scheduling
+- **API Gateway**: Enterprise API management with rate limiting, validation, and circuit breakers
+- **Database Layer**: High-performance async PostgreSQL with connection pooling and read replicas
+- **Caching**: Distributed Redis caching with cluster support and intelligent invalidation
 
-### MCP Integration
-- **Protocol Compliance**: Full MCP specification implementation
-- **Dynamic Discovery**: Real-time capability advertisement
-- **Resource Caching**: Intelligent caching for performance optimization
-- **Event Streaming**: Real-time vCenter event processing
-- **Bulk Operations**: Efficient mass operations support
-
-### Enterprise Features
-- **Multi-tenancy**: Isolated environments and resource segregation
-- **Compliance Reporting**: Automated compliance and audit reports
-- **Performance Analytics**: Advanced metrics and trend analysis
-- **Backup Integration**: Automated backup and recovery workflows
-- **Disaster Recovery**: Cross-site replication and failover
+### Advanced Enterprise Features
+- **Multi-vCenter Support**: Manage multiple vCenter instances with intelligent load balancing
+- **Bulk Operations**: Perform operations across multiple VMs/hosts with orchestration engine
+- **Custom Workflows**: Define and execute complex automation sequences with YAML configuration
+- **Performance Analytics**: Advanced monitoring with Prometheus and Grafana integration
+- **Compliance Management**: SOC2, ISO27001, and PCI-DSS compliance reporting and automation
+- **Enterprise Deployment**: Docker Swarm and Kubernetes deployment with HA configurations
+- **Integration Ready**: RESTful APIs with comprehensive documentation and enterprise SDKs
+- **Disaster Recovery**: Cross-site replication, automated failover, and recovery workflows
+- **Audit & Compliance**: Comprehensive audit trails with retention policies and compliance reporting
 
 ## Quick Start
 
@@ -389,6 +398,71 @@ sphinx-build -b html docs/ docs/_build/
 - **Performance Dashboards**: Real-time performance visualization
 - **Alerting**: Proactive issue detection and notification
 - **Capacity Planning**: Resource utilization trending
+
+## Enterprise Deployment
+
+### Production-Ready Architecture
+
+The VMware vCenter MCP Server includes comprehensive enterprise architecture with:
+
+- **8 Core Architecture Modules**: Authentication, Multi-tenancy, Database, Monitoring, HA, Security, Orchestration, API Gateway
+- **High Availability**: Active-active clustering with PostgreSQL and Redis clusters
+- **Enterprise Security**: Multi-layer security with threat detection and compliance
+- **Comprehensive Monitoring**: Prometheus, Grafana, and ELK stack integration
+- **Workflow Orchestration**: Complex automation with dependency management
+- **Multi-tenant Isolation**: Complete resource and data isolation
+
+### Quick Enterprise Setup
+
+```bash
+# Clone and setup enterprise deployment
+git clone https://github.com/uldyssian-sh/vmware-vcenter-mcp.git
+cd vmware-vcenter-mcp
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env with your enterprise settings
+
+# Deploy enterprise stack
+docker-compose -f docker-compose.enterprise.yml up -d
+
+# Verify deployment
+curl http://localhost/health
+```
+
+### Enterprise Configuration
+
+```yaml
+# config/enterprise.yaml
+host: "0.0.0.0"
+port: 8080
+workers: 8
+
+# vCenter Configuration
+vcenter_host: "vcenter.example.com"
+vcenter_username: "svc-vcenter-mcp@vsphere.local"
+vcenter_password: "${VCENTER_PASSWORD}"
+
+# Enterprise Features
+multi_tenant: true
+ha_enabled: true
+security_level: "high"
+encryption_enabled: true
+metrics_enabled: true
+orchestration_enabled: true
+compliance_standards: ["soc2", "iso27001", "pci-dss"]
+```
+
+### Kubernetes Enterprise Deployment
+
+```yaml
+# Deploy with Helm
+helm repo add vmware-vcenter-mcp https://charts.example.com/vmware-vcenter-mcp
+helm install vcenter-mcp vmware-vcenter-mcp/vmware-vcenter-mcp \
+  --values values-production.yaml \
+  --namespace vmware-vcenter-mcp \
+  --create-namespace
+```
 
 ## Deployment
 
