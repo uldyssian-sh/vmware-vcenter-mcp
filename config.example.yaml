@@ -1,0 +1,294 @@
+# VMware vCenter MCP Server Configuration
+# Copy this file to config.yaml and customize for your environment
+
+# vCenter Server Configuration
+vcenter:
+  # vCenter server address (IP or FQDN)
+  host: "vcenter.example.com"
+  
+  # Authentication credentials
+  username: "administrator@vsphere.local"
+  password: "${VCENTER_PASSWORD}"  # Use environment variable
+  
+  # Connection settings
+  port: 443
+  ssl_verify: true
+  timeout: 60
+  
+  # Session management
+  session_timeout: 1800
+  max_sessions: 100
+  
+  # Connection pool settings
+  pool_size: 10
+  max_retries: 3
+  retry_delay: 2
+  
+  # Default selections
+  datacenter: ""  # Auto-select first if empty
+  cluster: ""     # Auto-select first if empty
+  datastore: ""   # Auto-select largest if empty
+
+# MCP Server Configuration
+mcp:
+  # Server identification
+  server_name: "vmware-vcenter-mcp"
+  version: "1.0.0"
+  description: "VMware vCenter MCP Server"
+  
+  # Server capabilities
+  capabilities:
+    - "datacenter_management"
+    - "cluster_operations"
+    - "vm_lifecycle"
+    - "resource_management"
+    - "storage_operations"
+    - "network_management"
+    - "automation"
+    - "monitoring"
+  
+  # Server settings
+  host: "0.0.0.0"
+  port: 8080
+  workers: 8
+  
+  # Request limits
+  max_request_size: "50MB"
+  timeout: 600
+  
+  # Batch operation limits
+  max_batch_size: 100
+  batch_timeout: 1800
+
+# Security Configuration
+security:
+  # API authentication
+  api_key: "${MCP_API_KEY}"
+  
+  # Multi-factor authentication
+  mfa:
+    enabled: false
+    methods: ["totp", "hardware_token"]
+    backup_codes: true
+  
+  # Rate limiting
+  rate_limit: 200
+  rate_window: 60
+  burst_limit: 50
+  
+  # Session management
+  session_timeout: 7200
+  max_sessions: 200
+  
+  # Encryption settings
+  encryption: "AES256"
+  key_rotation: "90d"
+  
+  # SSL/TLS settings
+  ssl_cert: "/path/to/cert.pem"
+  ssl_key: "/path/to/key.pem"
+  ssl_ca: "/path/to/ca.pem"
+  
+  # RBAC settings
+  rbac:
+    enabled: true
+    default_role: "viewer"
+    admin_users: ["administrator@vsphere.local"]
+
+# Authentication Providers
+auth:
+  # Local authentication
+  local:
+    enabled: true
+    
+  # LDAP/Active Directory
+  ldap:
+    enabled: false
+    server: "ldap://ad.example.com"
+    base_dn: "DC=example,DC=com"
+    bind_dn: "CN=service,DC=example,DC=com"
+    bind_password: "${LDAP_PASSWORD}"
+    
+  # SAML SSO
+  saml:
+    enabled: false
+    idp_url: "https://idp.example.com/saml"
+    sp_entity_id: "vmware-vcenter-mcp"
+    certificate: "/path/to/saml.crt"
+
+# Logging Configuration
+logging:
+  # Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  level: "INFO"
+  
+  # Log output
+  file: "vcenter-mcp.log"
+  console: true
+  
+  # Log rotation
+  max_size: "50MB"
+  backup_count: 10
+  
+  # Log format
+  format: "json"
+  
+  # Structured logging
+  structured: true
+  
+  # Audit logging
+  audit:
+    enabled: true
+    file: "audit.log"
+    level: "INFO"
+    retention: "1y"
+    
+  # Security logging
+  security:
+    enabled: true
+    file: "security.log"
+    events:
+      - "authentication_failure"
+      - "privilege_escalation"
+      - "unauthorized_access"
+
+# Performance Configuration
+performance:
+  # Caching settings
+  cache:
+    enabled: true
+    backend: "redis"  # memory, redis
+    ttl: 300
+    max_size: 10000
+    
+  # Redis configuration (if using redis cache)
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+    password: "${REDIS_PASSWORD}"
+    
+  # Async settings
+  async_operations: true
+  max_concurrent: 50
+  queue_size: 1000
+  
+  # Database settings
+  database:
+    url: "sqlite:///vcenter-mcp.db"
+    pool_size: 20
+    max_overflow: 30
+    
+  # Monitoring
+  metrics:
+    enabled: true
+    port: 9090
+    path: "/metrics"
+    
+  # Health checks
+  health_checks:
+    vcenter_connectivity: true
+    database_connectivity: true
+    cache_connectivity: true
+
+# Feature Configuration
+features:
+  # Core features
+  datacenter_management: true
+  cluster_operations: true
+  vm_lifecycle: true
+  resource_management: true
+  storage_operations: true
+  network_management: true
+  
+  # Advanced features
+  automation: true
+  monitoring: true
+  backup_integration: true
+  disaster_recovery: true
+  
+  # Experimental features
+  experimental:
+    ai_optimization: false
+    predictive_analytics: false
+    auto_remediation: false
+
+# Integration Configuration
+integrations:
+  # Backup solutions
+  backup:
+    veeam:
+      enabled: false
+      server: "veeam.example.com"
+      username: "${VEEAM_USERNAME}"
+      password: "${VEEAM_PASSWORD}"
+      
+  # Monitoring solutions
+  monitoring:
+    vrops:
+      enabled: false
+      server: "vrops.example.com"
+      username: "${VROPS_USERNAME}"
+      password: "${VROPS_PASSWORD}"
+      
+    prometheus:
+      enabled: true
+      pushgateway: "prometheus.example.com:9091"
+      
+  # Notification systems
+  notifications:
+    email:
+      enabled: false
+      smtp_server: "smtp.example.com"
+      smtp_port: 587
+      username: "${SMTP_USERNAME}"
+      password: "${SMTP_PASSWORD}"
+      
+    slack:
+      enabled: false
+      webhook_url: "${SLACK_WEBHOOK_URL}"
+
+# Environment Configuration
+environment: "production"  # development, staging, production
+
+# Deployment Configuration
+deployment:
+  # Container settings
+  container:
+    image: "uldyssian-sh/vmware-vcenter-mcp:latest"
+    resources:
+      cpu: "2"
+      memory: "4Gi"
+      
+  # Kubernetes settings
+  kubernetes:
+    namespace: "vmware-mcp"
+    replicas: 3
+    service_type: "ClusterIP"
+    
+  # High availability
+  ha:
+    enabled: true
+    min_replicas: 2
+    max_replicas: 10
+    target_cpu: 70
+
+# Maintenance Configuration
+maintenance:
+  # Backup settings
+  backup:
+    enabled: true
+    schedule: "0 2 * * *"  # Daily at 2 AM
+    retention: "30d"
+    location: "/backup"
+    
+  # Update settings
+  updates:
+    auto_update: false
+    check_interval: "24h"
+    maintenance_window: "02:00-04:00"
+    
+  # Cleanup settings
+  cleanup:
+    logs: "30d"
+    cache: "7d"
+    sessions: "24h"
