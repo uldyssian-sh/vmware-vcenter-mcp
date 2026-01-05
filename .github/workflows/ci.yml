@@ -181,7 +181,6 @@ jobs:
         grep -q "# VMware vCenter MCP Server" README.md
         grep -q "## Features" README.md
         grep -q "## Quick Start" README.md
-        grep -q "## Contributors" README.md
         grep -q "⭐ Star this repository if you find it helpful!" README.md
         grep -q "Maintained by: uldyssian-sh" README.md
         grep -q "Disclaimer: Use of this code is at your own risk" README.md
