@@ -310,7 +310,7 @@ def example_integration():
     enterprise_config = {
         "mcp_server": {
             "name": "VMware vCenter MCP Server",
-            "version": "1.6.0",
+            "version": "1.5.0",
             "host": "0.0.0.0",
             "port": 8080
         },
