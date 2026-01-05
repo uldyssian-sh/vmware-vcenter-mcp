@@ -14,10 +14,21 @@ import secrets
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
-import redis.asyncio as redis
-import structlog
+# Optional imports with graceful fallback
+try:
+    import redis.asyncio as redis
+    REDIS_AVAILABLE = True
+except ImportError:
+    REDIS_AVAILABLE = False
+    import warnings
+    warnings.warn("Redis not available. Using in-memory session storage.", ImportWarning)
 
-logger = structlog.get_logger(__name__)
+try:
+    import structlog
+    logger = structlog.get_logger(__name__)
+except ImportError:
+    import logging
+    logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -60,6 +71,12 @@ class SessionManager:
     
     async def initialize(self):
         """Initialize Redis connection"""
+        if not REDIS_AVAILABLE:
+            logger.warning("Redis not available, using in-memory session storage")
+            self.redis_client = None
+            self._memory_sessions = {}
+            return
+            
         try:
             self.redis_client = redis.from_url(self.redis_url)
             await self.redis_client.ping()

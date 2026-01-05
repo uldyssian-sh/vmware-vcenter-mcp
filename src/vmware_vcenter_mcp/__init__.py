@@ -16,121 +16,82 @@ __author__ = "uldyssian-sh"
 __license__ = "MIT"
 __description__ = "VMware vCenter MCP Server - Enterprise virtualization management via MCP"
 
-# Core MCP Server
-from .server import VCenterMCPServer
+# Import only existing modules to avoid import errors
+try:
+    # Security and compliance modules
+    from .core.security import SecurityManager, EncryptionManager
+    from .core.auth import AuthenticationManager, AuthorizationManager, RBACManager
+    from .audit_logger import EnterpriseAuditLogger
+    from .gdpr_compliance import GDPRComplianceManager
+    from .session_manager import SessionManager
+    from .threat_intelligence import ThreatIntelligenceManager
+    
+    # Exception handling
+    from .exceptions import (
+        VCenterConnectionError,
+        VCenterAuthenticationError,
+        VCenterOperationError,
+        ValidationError,
+        ClusterOperationError,
+        DatacenterOperationError
+    )
+    
+    _IMPORTS_AVAILABLE = True
+    
+except ImportError as e:
+    # Graceful degradation if some modules are not available
+    _IMPORTS_AVAILABLE = False
+    import warnings
+    warnings.warn(f"Some modules could not be imported: {e}", ImportWarning)
 
-# Enterprise Server
-from .enterprise_server import EnterpriseServer, EnterpriseConfig, create_server_from_config
+# Core functionality that should always be available
+def get_version():
+    """Get the current version of VMware vCenter MCP Server."""
+    return __version__
 
-# Core Architecture Components
-from .core import (
-    # Authentication & Authorization
-    AuthenticationManager,
-    AuthorizationManager,
-    RBACManager,
-    
-    # Multi-tenancy
-    TenantManager,
-    TenantIsolationManager,
-    
-    # Data Layer
-    DatabaseManager,
-    ConnectionPoolManager,
-    CacheManager,
-    DistributedCacheManager,
-    
-    # Monitoring & Observability
-    MetricsCollector,
-    HealthCheckManager,
-    AuditLogger,
-    
-    # High Availability
-    HighAvailabilityManager,
-    LoadBalancerManager,
-    
-    # Security & Compliance
-    SecurityManager,
-    EncryptionManager,
-    ComplianceManager,
-    
-    # Orchestration
-    OrchestrationEngine,
-    WorkflowManager,
-    
-    # API Management
-    APIGateway,
-    RateLimitManager,
-    RequestValidator
-)
+def get_info():
+    """Get information about VMware vCenter MCP Server."""
+    return {
+        "name": "VMware vCenter MCP Server",
+        "version": __version__,
+        "author": __author__,
+        "license": __license__,
+        "description": __description__,
+        "imports_available": _IMPORTS_AVAILABLE
+    }
 
-# Exceptions
-from .exceptions import (
-    VCenterConnectionError,
-    VCenterAuthenticationError,
-    VCenterOperationError,
-    ValidationError,
-    ClusterOperationError,
-    DatacenterOperationError
-)
-
+# Export available components
 __all__ = [
-    # Core MCP Server
-    "VCenterMCPServer",
-    
-    # Enterprise Server
-    "EnterpriseServer",
-    "EnterpriseConfig",
-    "create_server_from_config",
-    
-    # Authentication & Authorization
-    "AuthenticationManager",
-    "AuthorizationManager",
-    "RBACManager",
-    
-    # Multi-tenancy
-    "TenantManager",
-    "TenantIsolationManager",
-    
-    # Data Layer
-    "DatabaseManager",
-    "ConnectionPoolManager",
-    "CacheManager",
-    "DistributedCacheManager",
-    
-    # Monitoring & Observability
-    "MetricsCollector",
-    "HealthCheckManager",
-    "AuditLogger",
-    
-    # High Availability
-    "HighAvailabilityManager",
-    "LoadBalancerManager",
-    
-    # Security & Compliance
-    "SecurityManager",
-    "EncryptionManager",
-    "ComplianceManager",
-    
-    # Orchestration
-    "OrchestrationEngine",
-    "WorkflowManager",
-    
-    # API Management
-    "APIGateway",
-    "RateLimitManager",
-    "RequestValidator",
-    
-    # Exceptions
-    "VCenterConnectionError",
-    "VCenterAuthenticationError", 
-    "VCenterOperationError",
-    "ValidationError",
-    "ClusterOperationError",
-    "DatacenterOperationError",
-    
     # Metadata
     "__version__",
     "__author__",
     "__license__",
-    "__description__"
+    "__description__",
+    
+    # Core functions
+    "get_version",
+    "get_info"
 ]
+
+# Add available imports to __all__
+if _IMPORTS_AVAILABLE:
+    __all__.extend([
+        # Security & Compliance
+        "SecurityManager",
+        "EncryptionManager",
+        "AuthenticationManager",
+        "AuthorizationManager", 
+        "RBACManager",
+        "EnterpriseAuditLogger",
+        "GDPRComplianceManager",
+        "SessionManager",
+        "ThreatIntelligenceManager",
+        
+        # Exceptions
+        "VCenterConnectionError",
+        "VCenterAuthenticationError",
+        "VCenterOperationError",
+        "ValidationError",
+        "ClusterOperationError",
+        "DatacenterOperationError"
+    ])

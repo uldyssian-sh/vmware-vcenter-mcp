@@ -16,16 +16,33 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Tuple, Set
 from dataclasses import dataclass, field
 from enum import Enum
-import structlog
 import re
 import ipaddress
 from collections import defaultdict, deque
-import numpy as np
-from sklearn.ensemble import IsolationForest
-from sklearn.preprocessing import StandardScaler
-import requests
 
-logger = structlog.get_logger(__name__)
+# Optional imports with graceful fallback
+try:
+    import structlog
+    logger = structlog.get_logger(__name__)
+except ImportError:
+    import logging
+    logger = logging.getLogger(__name__)
+
+try:
+    import numpy as np
+    from sklearn.ensemble import IsolationForest
+    from sklearn.preprocessing import StandardScaler
+    ML_AVAILABLE = True
+except ImportError:
+    ML_AVAILABLE = False
+    import warnings
+    warnings.warn("ML libraries not available. Some threat detection features will be disabled.", ImportWarning)
+
+try:
+    import requests
+    REQUESTS_AVAILABLE = True
+except ImportError:
+    REQUESTS_AVAILABLE = False
 
 
 class ThreatLevel(Enum):
@@ -114,7 +131,12 @@ class ThreatIntelligenceManager:
         self.scaler = StandardScaler()
         
         # ML models
-        self.isolation_forest = IsolationForest(contamination=0.1, random_state=42)
+        if ML_AVAILABLE:
+            self.isolation_forest = IsolationForest(contamination=0.1, random_state=42)
+            self.scaler = StandardScaler()
+        else:
+            self.isolation_forest = None
+            self.scaler = None
         self.model_trained = False
         
         # Threat patterns
@@ -180,7 +202,7 @@ class ThreatIntelligenceManager:
             ]
         }
     
-    async def analyze_request(self, request_data: Dict[str, Any]) -> ThreatEvent:
+    async def analyze_request(self, request_data: Dict[str, Any]) -> Optional[ThreatEvent]:
         """Analyze request for threats using ML and pattern matching"""
         if not self.enabled:
             return None
@@ -385,7 +407,7 @@ class ThreatIntelligenceManager:
     
     async def _ml_anomaly_detection(self, request_data: Dict[str, Any]) -> Optional[ThreatIndicator]:
         """Use ML models for anomaly detection"""
-        if not self.model_trained:
+        if not ML_AVAILABLE or not self.model_trained:
             return None
         
         try:
@@ -495,6 +517,10 @@ class ThreatIntelligenceManager:
     
     async def train_ml_models(self, training_data: List[Dict[str, Any]]):
         """Train ML models with historical data"""
+        if not ML_AVAILABLE:
+            logger.warning("ML libraries not available, skipping model training")
+            return
+            
         if len(training_data) < 100:
             logger.warning("Insufficient training data for ML models", 
                           data_size=len(training_data))

@@ -15,10 +15,15 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Set
 from dataclasses import dataclass, field
 from enum import Enum
-import structlog
-import uuid
+# Optional imports with graceful fallback
+try:
+    import structlog
+    logger = structlog.get_logger(__name__)
+except ImportError:
+    import logging
+    logger = logging.getLogger(__name__)
 
-logger = structlog.get_logger(__name__)
+import uuid
 
 
 class DataSubjectRequestType(Enum):

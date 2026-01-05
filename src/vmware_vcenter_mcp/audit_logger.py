@@ -15,11 +15,16 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Union
 from dataclasses import dataclass, field, asdict
 from enum import Enum
-import structlog
+# Optional imports with graceful fallback
+try:
+    import structlog
+    logger = structlog.get_logger(__name__)
+except ImportError:
+    import logging
+    logger = logging.getLogger(__name__)
+
 import uuid
 import os
-
-logger = structlog.get_logger(__name__)
 
 
 class AuditEventType(Enum):
