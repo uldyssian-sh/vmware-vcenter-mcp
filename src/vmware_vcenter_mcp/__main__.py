@@ -23,10 +23,10 @@ def setup_logging(level: str = "INFO") -> None:
     """Setup logging configuration"""
     logging.basicConfig(
         level=getattr(logging, level.upper()),
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[
             logging.StreamHandler(sys.stdout),
-            logging.FileHandler('vcenter-mcp.log')
+            logging.FileHandler("vcenter-mcp.log")
         ]
     )
 
@@ -37,7 +37,7 @@ async def run_basic_server(config_file: Optional[str] = None) -> None:
     
     # Load configuration
     if config_file and os.path.exists(config_file):
-        with open(config_file, 'r') as f:
+        with open(config_file, "r") as f:
             config = yaml.safe_load(f)
     else:
         config = {

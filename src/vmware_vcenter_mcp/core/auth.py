@@ -315,7 +315,7 @@ class AuthenticationManager:
 class AuthorizationManager:
     """Enterprise authorization manager"""
     
-    def __init__(self, rbac_manager: 'RBACManager'):
+    def __init__(self, rbac_manager: "RBACManager"):
         self.rbac = rbac_manager
         logger.info("Authorization manager initialized")
     
@@ -525,7 +525,7 @@ class LDAPProvider:
             
             # Search for user
             user_filter = self.user_filter.format(username=username)
-            conn.search(self.base_dn, user_filter, attributes=['cn', 'mail', 'memberOf'])
+            conn.search(self.base_dn, user_filter, attributes=["cn", "mail", "memberOf"])
             
             if not conn.entries:
                 return None

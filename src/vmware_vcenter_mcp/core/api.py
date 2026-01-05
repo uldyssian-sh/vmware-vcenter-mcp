@@ -714,7 +714,7 @@ class RequestValidator:
         # Validate JSON body
         if context.body and context.headers.get("Content-Type", "").startswith("application/json"):
             try:
-                json.loads(context.body.decode('utf-8'))
+                json.loads(context.body.decode("utf-8"))
             except (json.JSONDecodeError, UnicodeDecodeError):
                 errors.append("Invalid JSON in request body")
         
@@ -728,7 +728,7 @@ class RequestValidator:
             r"drop\s+table"
         ]
         
-        request_text = f"{context.path} {json.dumps(context.query_params)} {context.body.decode('utf-8', errors='ignore') if context.body else ''}"
+        request_text = f"{context.path} {json.dumps(context.query_params)} {context.body.decode("utf-8", errors="ignore") if context.body else ""}"
         
         for pattern in suspicious_patterns:
             if re.search(pattern, request_text, re.IGNORECASE):

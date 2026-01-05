@@ -110,9 +110,8 @@ class TenantModel(Base):
     billing_info = Column(JSON)
     
     __table_args__ = (
-        Index('idx_tenant_status', 'status'),
-        Index('idx_tenant_created_at', 'created_at'),
-    )
+        Index("idx_tenant_status", "status"),
+        Index("idx_tenant_created_at", "created_at"))
 
 
 class UserModel(Base):
@@ -146,11 +145,10 @@ class UserModel(Base):
     metadata = Column(JSON)
     
     __table_args__ = (
-        Index('idx_user_username', 'username'),
-        Index('idx_user_email', 'email'),
-        Index('idx_user_tenant', 'tenant_id'),
-        Index('idx_user_active', 'is_active'),
-    )
+        Index("idx_user_username", "username"),
+        Index("idx_user_email", "email"),
+        Index("idx_user_tenant", "tenant_id"),
+        Index("idx_user_active", "is_active"))
 
 
 class SessionModel(Base):
@@ -177,10 +175,9 @@ class SessionModel(Base):
     metadata = Column(JSON)
     
     __table_args__ = (
-        Index('idx_session_user', 'user_id'),
-        Index('idx_session_expires', 'expires_at'),
-        Index('idx_session_tenant', 'tenant_id'),
-    )
+        Index("idx_session_user", "user_id"),
+        Index("idx_session_expires", "expires_at"),
+        Index("idx_session_tenant", "tenant_id"))
 
 
 class AuditLogModel(Base):
@@ -219,12 +216,11 @@ class AuditLogModel(Base):
     timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     __table_args__ = (
-        Index('idx_audit_timestamp', 'timestamp'),
-        Index('idx_audit_user', 'user_id'),
-        Index('idx_audit_tenant', 'tenant_id'),
-        Index('idx_audit_event_type', 'event_type'),
-        Index('idx_audit_success', 'success'),
-    )
+        Index("idx_audit_timestamp", "timestamp"),
+        Index("idx_audit_user", "user_id"),
+        Index("idx_audit_tenant", "tenant_id"),
+        Index("idx_audit_event_type", "event_type"),
+        Index("idx_audit_success", "success"))
 
 
 class DatabaseManager:

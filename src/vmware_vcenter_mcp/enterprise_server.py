@@ -448,7 +448,7 @@ class EnterpriseServer:
         # vCenter health check
         async def check_vcenter() -> Dict[str, str]:
             try:
-                if self.mcp_server and hasattr(self.mcp_server, 'vcenter_client'):
+                if self.mcp_server and hasattr(self.mcp_server, "vcenter_client"):
                     # Test vCenter connection
                     # This would be implemented in the actual MCP server
                     return {"message": "vCenter connection healthy"}
@@ -605,8 +605,8 @@ async def create_server_from_config(config_path: str) -> EnterpriseServer:
     if not config_file.exists():
         raise FileNotFoundError(f"Configuration file not found: {config_path}")
     
-    with open(config_file, 'r') as f:
-        if config_path.endswith('.yaml') or config_path.endswith('.yml'):
+    with open(config_file, "r") as f:
+        if config_path.endswith(".yaml") or config_path.endswith(".yml"):
             config_data = yaml.safe_load(f)
         else:
             import json
@@ -638,8 +638,7 @@ async def main() -> None:
         context_class=dict,
         logger_factory=structlog.stdlib.LoggerFactory(),
         wrapper_class=structlog.stdlib.BoundLogger,
-        cache_logger_on_first_use=True,
-    )
+        cache_logger_on_first_use=True)
     
     # Get configuration
     config_path = sys.argv[1] if len(sys.argv) > 1 else "config.yaml"

@@ -412,7 +412,7 @@ class MetricsCollector:
     
     def get_metrics(self) -> str:
         """Get metrics in Prometheus format"""
-        return generate_latest(self.registry).decode('utf-8')
+        return generate_latest(self.registry).decode("utf-8")
     
     def create_custom_metric(self, definition: MetricDefinition) -> Any:
         """Create custom metric"""

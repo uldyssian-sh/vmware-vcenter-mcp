@@ -401,7 +401,7 @@ class SecurityManager:
                 # Create security incident for high-severity threats
                 if rule.get("severity", "medium") in ["high", "critical"]:
                     await self._create_security_incident(
-                        title=f"Threat detected: {rule['name']}",
+                        title=f"Threat detected: {rule["name"]}",
                         description=rule["description"],
                         threat_level=ThreatLevel.HIGH,
                         category="threat_detection",
@@ -557,7 +557,7 @@ class EncryptionManager:
         algorithm = algorithm or self.default_algorithm
         
         if isinstance(data, str):
-            data = data.encode('utf-8')
+            data = data.encode("utf-8")
         
         if algorithm == EncryptionAlgorithm.AES_256_GCM:
             return await self._encrypt_aes_gcm(data, key_id)
@@ -598,9 +598,9 @@ class EncryptionManager:
         return {
             "algorithm": EncryptionAlgorithm.AES_256_GCM.value,
             "key_id": key.id,
-            "iv": base64.b64encode(iv).decode('utf-8'),
-            "ciphertext": base64.b64encode(ciphertext).decode('utf-8'),
-            "tag": base64.b64encode(encryptor.tag).decode('utf-8'),
+            "iv": base64.b64encode(iv).decode("utf-8"),
+            "ciphertext": base64.b64encode(ciphertext).decode("utf-8"),
+            "tag": base64.b64encode(encryptor.tag).decode("utf-8"),
             "encrypted_at": datetime.utcnow().isoformat()
         }
     
@@ -643,8 +643,8 @@ class EncryptionManager:
         return {
             "algorithm": EncryptionAlgorithm.AES_256_CBC.value,
             "key_id": key.id,
-            "iv": base64.b64encode(iv).decode('utf-8'),
-            "ciphertext": base64.b64encode(ciphertext).decode('utf-8'),
+            "iv": base64.b64encode(iv).decode("utf-8"),
+            "ciphertext": base64.b64encode(ciphertext).decode("utf-8"),
             "encrypted_at": datetime.utcnow().isoformat()
         }
     

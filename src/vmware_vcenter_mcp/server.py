@@ -357,7 +357,7 @@ class VCenterMCPServer:
                     "name": datacenter.name,
                     "moid": datacenter._moId
                 },
-                "message": f"Datacenter '{name}' created successfully"
+                "message": f"Datacenter "{name}" created successfully"
             }
             
         except Exception as e:
@@ -373,7 +373,7 @@ class VCenterMCPServer:
                 datacenter_list.append({
                     "name": dc.name,
                     "moid": dc._moId,
-                    "overall_status": str(dc.overallStatus) if hasattr(dc, 'overallStatus') else "unknown"
+                    "overall_status": str(dc.overallStatus) if hasattr(dc, "overallStatus") else "unknown"
                 })
             
             return {
@@ -397,7 +397,7 @@ class VCenterMCPServer:
             # Get datacenter
             datacenter = self.vcenter_client.get_obj(vim.Datacenter, datacenter_name)
             if not datacenter:
-                raise ResourceNotFoundError(f"Datacenter '{datacenter_name}' not found")
+                raise ResourceNotFoundError(f"Datacenter "{datacenter_name}" not found")
             
             # Create cluster spec
             cluster_spec = vim.cluster.ConfigSpecEx()
@@ -418,7 +418,7 @@ class VCenterMCPServer:
                     "moid": cluster._moId,
                     "datacenter": datacenter_name
                 },
-                "message": f"Cluster '{name}' created successfully"
+                "message": f"Cluster "{name}" created successfully"
             }
             
         except Exception as e:
@@ -519,14 +519,14 @@ class VCenterMCPServer:
             # Get datacenter
             datacenter = self.vcenter_client.get_obj(vim.Datacenter, datacenter_name)
             if not datacenter:
-                raise ResourceNotFoundError(f"Datacenter '{datacenter_name}' not found")
+                raise ResourceNotFoundError(f"Datacenter "{datacenter_name}" not found")
             
             # Get cluster or use first available
             cluster_name = args.get("cluster")
             if cluster_name:
                 cluster = self.vcenter_client.get_obj(vim.ClusterComputeResource, cluster_name)
                 if not cluster:
-                    raise ResourceNotFoundError(f"Cluster '{cluster_name}' not found")
+                    raise ResourceNotFoundError(f"Cluster "{cluster_name}" not found")
                 resource_pool = cluster.resourcePool
             else:
                 clusters = self.vcenter_client.get_all_objs(vim.ClusterComputeResource)
@@ -539,7 +539,7 @@ class VCenterMCPServer:
             if datastore_name:
                 datastore = self.vcenter_client.get_obj(vim.Datastore, datastore_name)
                 if not datastore:
-                    raise ResourceNotFoundError(f"Datastore '{datastore_name}' not found")
+                    raise ResourceNotFoundError(f"Datastore "{datastore_name}" not found")
             else:
                 datastores = self.vcenter_client.get_all_objs(vim.Datastore)
                 if not datastores:
@@ -582,7 +582,7 @@ class VCenterMCPServer:
                     "moid": result._moId,
                     "datacenter": datacenter_name
                 },
-                "message": f"VM '{name}' created successfully"
+                "message": f"VM "{name}" created successfully"
             }
             
         except Exception as e:
@@ -599,7 +599,7 @@ class VCenterMCPServer:
         try:
             vm = self.vcenter_client.get_obj(vim.VirtualMachine, vm_name)
             if not vm:
-                raise ResourceNotFoundError(f"VM '{vm_name}' not found")
+                raise ResourceNotFoundError(f"VM "{vm_name}" not found")
             
             if action == "on":
                 task = vm.PowerOnVM_Task()
@@ -618,7 +618,7 @@ class VCenterMCPServer:
                 "success": True,
                 "vm": vm_name,
                 "action": action,
-                "message": f"VM '{vm_name}' power {action} completed successfully"
+                "message": f"VM "{vm_name}" power {action} completed successfully"
             }
             
         except Exception as e:
@@ -634,7 +634,7 @@ class VCenterMCPServer:
         try:
             vm = self.vcenter_client.get_obj(vim.VirtualMachine, vm_name)
             if not vm:
-                raise ResourceNotFoundError(f"VM '{vm_name}' not found")
+                raise ResourceNotFoundError(f"VM "{vm_name}" not found")
             
             vm_info = {
                 "name": vm.name,
@@ -684,7 +684,7 @@ class VCenterMCPServer:
                     "free_space_gb": round(ds.summary.freeSpace / (1024**3), 2),
                     "used_space_gb": round((ds.summary.capacity - ds.summary.freeSpace) / (1024**3), 2),
                     "accessible": ds.summary.accessible,
-                    "maintenance_mode": ds.summary.maintenanceMode if hasattr(ds.summary, 'maintenanceMode') else "normal"
+                    "maintenance_mode": ds.summary.maintenanceMode if hasattr(ds.summary, "maintenanceMode") else "normal"
                 }
                 datastore_list.append(ds_info)
             
@@ -717,7 +717,7 @@ class VCenterMCPServer:
                 raise ValidationError(f"Invalid entity type: {entity_type}")
             
             if not entity:
-                raise ResourceNotFoundError(f"{entity_type.title()} '{entity_name}' not found")
+                raise ResourceNotFoundError(f"{entity_type.title()} "{entity_name}" not found")
             
             # Get basic performance info
             perf_info = {
@@ -726,14 +726,14 @@ class VCenterMCPServer:
                 "timestamp": datetime.utcnow().isoformat()
             }
             
-            if entity_type == "vm" and hasattr(entity, 'runtime'):
+            if entity_type == "vm" and hasattr(entity, "runtime"):
                 perf_info.update({
                     "power_state": str(entity.runtime.powerState),
                     "memory_mb": entity.config.hardware.memoryMB if entity.config else 0,
                     "num_cpus": entity.config.hardware.numCPU if entity.config else 0,
                     "host": entity.runtime.host.name if entity.runtime.host else None
                 })
-            elif entity_type == "host" and hasattr(entity, 'summary'):
+            elif entity_type == "host" and hasattr(entity, "summary"):
                 perf_info.update({
                     "connection_state": str(entity.runtime.connectionState),
                     "power_state": str(entity.runtime.powerState),
@@ -741,7 +741,7 @@ class VCenterMCPServer:
                     "memory_mb": entity.summary.hardware.memorySize // (1024*1024) if entity.summary.hardware else 0,
                     "num_vms": len(entity.vm) if entity.vm else 0
                 })
-            elif entity_type == "cluster" and hasattr(entity, 'summary'):
+            elif entity_type == "cluster" and hasattr(entity, "summary"):
                 perf_info.update({
                     "overall_status": str(entity.overallStatus),
                     "num_hosts": len(entity.host) if entity.host else 0,
@@ -798,7 +798,7 @@ async def main() -> None:
     # Load configuration
     config_file = os.getenv("CONFIG_FILE", "config.yaml")
     if os.path.exists(config_file):
-        with open(config_file, 'r') as f:
+        with open(config_file, "r") as f:
             config = yaml.safe_load(f)
     else:
         config = {
@@ -812,7 +812,7 @@ async def main() -> None:
     # Setup logging
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     
     # Create and start server
