@@ -83,7 +83,7 @@ vcenter:
 
 mcp:
   server_name: "vmware-vcenter-mcp"
-  version: "1.0.0"
+  version: "1.7.0"
   capabilities:
     - "datacenter_management"
     - "cluster_operations"
