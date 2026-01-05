@@ -28,7 +28,21 @@ bandit>=1.7.5
 safety>=2.3.5
 semgrep>=1.45.0
 
+# Advanced threat detection and ML
+scikit-learn>=1.3.0
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# Redis for session management
+redis[hiredis]>=5.0.0
+
 # Development and testing
 pytest>=8.0.0
 pytest-asyncio>=0.21.0
 pytest-cov>=4.0.0
+
+# Code quality tools
+prospector>=1.10.0
+pylint>=3.0.0
+mypy>=1.7.0
