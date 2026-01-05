@@ -135,7 +135,7 @@ CMD ["python", "-m", "vmware_vcenter_mcp.enterprise_server", "/app/config/enterp
 # Development stage (optional)
 FROM production as development
 
-# Switch back to root for development tools
+# Install development dependencies as root, then switch back to mcp user
 USER root
 
 # Install development dependencies
@@ -147,6 +147,9 @@ RUN apt-get update && apt-get install -y \
     tcpdump \
     netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
+
+# Switch back to non-root user for security
+USER mcp
 
 # Install development Python packages
 RUN pip install --no-cache-dir \
