@@ -16,20 +16,44 @@ from typing import Dict, List, Optional, Any, Sequence
 from dataclasses import dataclass
 import ssl
 
-# MCP imports
-from mcp.server import Server
-from mcp.server.models import InitializationOptions
-from mcp.server.stdio import stdio_server
-from mcp.types import (
-    Resource, Tool, TextContent, ImageContent, EmbeddedResource,
-    CallToolRequest, CallToolResult, ListResourcesRequest, ListResourcesResult,
-    ListToolsRequest, ListToolsResult, ReadResourceRequest, ReadResourceResult
-)
+# MCP imports with graceful fallback
+try:
+    from mcp.server import Server
+    from mcp.server.models import InitializationOptions
+    from mcp.server.stdio import stdio_server
+    from mcp.types import (
+        Resource, Tool, TextContent, ImageContent, EmbeddedResource,
+        CallToolRequest, CallToolResult, ListResourcesRequest, ListResourcesResult,
+        ListToolsRequest, ListToolsResult, ReadResourceRequest, ReadResourceResult
+    )
+    MCP_AVAILABLE = True
+except ImportError:
+    MCP_AVAILABLE = False
+    import warnings
+    warnings.warn("MCP library not available. Running in development mode.", ImportWarning)
+    
+    # Mock classes for development
+    class Server:
+        def __init__(self, name: str, version: str):
+            self.name = name
+            self.version = version
+    
+    class Tool:
+        def __init__(self, name: str, description: str, inputSchema: dict):
+            self.name = name
+            self.description = description
+            self.inputSchema = inputSchema
 
-# VMware imports
-from pyVmomi import vim, vmodl
-from pyVim.connect import SmartConnect, Disconnect
-from pyVim.task import WaitForTask
+# VMware imports with graceful fallback
+try:
+    from pyVmomi import vim, vmodl
+    from pyVim.connect import SmartConnect, Disconnect
+    from pyVim.task import WaitForTask
+    PYVMOMI_AVAILABLE = True
+except ImportError:
+    PYVMOMI_AVAILABLE = False
+    import warnings
+    warnings.warn("pyVmomi library not available. VMware functionality will be limited.", ImportWarning)
 
 # Local imports
 from .exceptions import (

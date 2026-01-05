@@ -128,16 +128,16 @@ class ThreatIntelligenceManager:
         # Behavioral analysis
         self.behavioral_profiles: Dict[str, BehavioralProfile] = {}
         self.anomaly_detector = None
-        self.scaler = StandardScaler()
         
         # ML models
         if ML_AVAILABLE:
             self.isolation_forest = IsolationForest(contamination=0.1, random_state=42)
             self.scaler = StandardScaler()
+            self.model_trained = False
         else:
             self.isolation_forest = None
             self.scaler = None
-        self.model_trained = False
+            self.model_trained = False
         
         # Threat patterns
         self.threat_patterns = self._init_threat_patterns()

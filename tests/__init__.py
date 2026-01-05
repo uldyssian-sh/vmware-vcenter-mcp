@@ -1,1 +1,6 @@
-# VMware vCenter MCP Server Tests
+"""
+Test package for VMware vCenter MCP Server
+
+Author: uldyssian-sh
+License: MIT
+"""
