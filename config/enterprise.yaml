@@ -1,0 +1,295 @@
+# VMware vCenter MCP Enterprise Server Configuration
+# Production-ready configuration for enterprise deployments
+
+# Server Configuration
+host: "0.0.0.0"
+port: 8080
+workers: 8
+
+# vCenter Configuration
+vcenter_host: "vcenter.example.com"
+vcenter_username: "svc-vcenter-mcp@vsphere.local"
+vcenter_password: "${VCENTER_PASSWORD}"
+vcenter_ssl_verify: true
+
+# Database Configuration
+database_url: "postgresql+asyncpg://vcenter_mcp:${DB_PASSWORD}@postgres-cluster:5432/vcenter_mcp"
+
+# Cache Configuration
+redis_url: "redis://redis-cluster:6379/0"
+
+# Security Configuration
+security_level: "high"
+encryption_enabled: true
+
+# Multi-Tenancy Configuration
+multi_tenant: true
+default_tenant: "default"
+
+# High Availability Configuration
+ha_enabled: true
+ha_mode: "active-active"
+
+# Monitoring Configuration
+metrics_enabled: true
+health_checks_enabled: true
+audit_logging_enabled: true
+
+# API Gateway Configuration
+api_gateway_enabled: true
+rate_limiting_enabled: true
+
+# Orchestration Configuration
+orchestration_enabled: true
+
+# Compliance Configuration
+compliance_standards:
+  - "soc2"
+  - "iso27001"
+  - "pci-dss"
+
+# Advanced Configuration
+advanced:
+  # Database Settings
+  database:
+    min_connections: 10
+    max_connections: 100
+    pool_timeout: 30
+    pool_recycle: 3600
+    statement_timeout: 300000
+    
+  # Cache Settings
+  cache:
+    default_ttl: 300
+    cluster_mode: true
+    compression: true
+    
+  # Security Settings
+  security:
+    threat_detection: true
+    rate_limiting:
+      global_requests_per_minute: 2000
+      ip_requests_per_minute: 200
+      user_requests_per_minute: 500
+    network_security:
+      allowed_networks:
+        - "10.0.0.0/8"
+        - "192.168.0.0/16"
+      blocked_networks:
+        - "0.0.0.0/0"
+    
+  # Authentication Settings
+  authentication:
+    jwt_secret: "${JWT_SECRET}"
+    session_timeout: 7200
+    max_login_attempts: 5
+    lockout_duration: 900
+    providers:
+      - name: "active_directory"
+        type: "ldap"
+        config:
+          server: "ldap://ad.example.com"
+          base_dn: "DC=example,DC=com"
+          bind_dn: "CN=svc-vcenter-mcp,OU=Service Accounts,DC=example,DC=com"
+          bind_password: "${LDAP_PASSWORD}"
+          user_filter: "(&(objectClass=user)(sAMAccountName={username}))"
+          group_filter: "(&(objectClass=group)(member={user_dn}))"
+      
+      - name: "saml_sso"
+        type: "saml"
+        config:
+          idp_url: "https://sso.example.com/saml"
+          sp_entity_id: "vmware-vcenter-mcp"
+          certificate: "/app/certs/saml.crt"
+          private_key: "/app/certs/saml.key"
+    
+  # Multi-Tenancy Settings
+  tenancy:
+    isolation_level: "strict"
+    default_quotas:
+      max_vms: 1000
+      max_cpu_cores: 500
+      max_memory_gb: 2048
+      max_storage_gb: 10240
+      max_networks: 50
+      max_snapshots: 5000
+      max_templates: 100
+      max_users: 100
+      api_requests_per_minute: 1000
+      concurrent_operations: 50
+    
+  # High Availability Settings
+  high_availability:
+    health_check_interval: 30
+    failover_timeout: 60
+    load_balancer:
+      algorithm: "weighted_round_robin"
+      health_check: "/health"
+      sticky_sessions: false
+    nodes:
+      - id: "node-1"
+        name: "vCenter MCP Node 1"
+        host: "vcenter-mcp-1.example.com"
+        port: 8080
+        weight: 100
+      - id: "node-2"
+        name: "vCenter MCP Node 2"
+        host: "vcenter-mcp-2.example.com"
+        port: 8080
+        weight: 100
+      - id: "node-3"
+        name: "vCenter MCP Node 3"
+        host: "vcenter-mcp-3.example.com"
+        port: 8080
+        weight: 100
+    
+  # Monitoring Settings
+  monitoring:
+    metrics:
+      collection_interval: 15
+      retention_days: 30
+      prometheus_endpoint: "/metrics"
+    
+    health_checks:
+      global_timeout: 300
+      checks:
+        - name: "database"
+          interval: 30
+          timeout: 10
+          critical: true
+        - name: "cache"
+          interval: 30
+          timeout: 5
+          critical: false
+        - name: "vcenter"
+          interval: 60
+          timeout: 15
+          critical: true
+    
+    audit_logging:
+      level: "detailed"
+      retention_days: 2555  # 7 years
+      destinations:
+        - type: "file"
+          path: "/app/logs/audit.log"
+          rotation: "daily"
+        - type: "database"
+          table: "audit_logs"
+        - type: "syslog"
+          server: "syslog.example.com:514"
+        - type: "elasticsearch"
+          url: "https://elasticsearch.example.com:9200"
+          index: "vcenter-mcp-audit"
+    
+  # API Gateway Settings
+  api_gateway:
+    rate_limiting:
+      rules:
+        - name: "global_limit"
+          type: "requests_per_minute"
+          limit: 2000
+          scope: "global"
+        - name: "ip_limit"
+          type: "requests_per_minute"
+          limit: 200
+          scope: "ip"
+        - name: "user_limit"
+          type: "requests_per_minute"
+          limit: 500
+          scope: "user"
+        - name: "tenant_limit"
+          type: "requests_per_minute"
+          limit: 1000
+          scope: "tenant"
+    
+    validation:
+      level: "enterprise"
+      max_request_size: "50MB"
+      required_headers:
+        - "Content-Type"
+        - "User-Agent"
+        - "X-Request-ID"
+      
+    cors:
+      enabled: true
+      allowed_origins:
+        - "https://vcenter-ui.example.com"
+        - "https://admin.example.com"
+      allowed_methods:
+        - "GET"
+        - "POST"
+        - "PUT"
+        - "DELETE"
+        - "OPTIONS"
+      allowed_headers:
+        - "Content-Type"
+        - "Authorization"
+        - "X-API-Key"
+        - "X-Request-ID"
+    
+  # Orchestration Settings
+  orchestration:
+    scheduler_enabled: true
+    max_concurrent_executions: 100
+    thread_pool_size: 20
+    workflow_timeout: 7200  # 2 hours
+    task_timeout: 1800      # 30 minutes
+    
+  # Encryption Settings
+  encryption:
+    default_algorithm: "aes-256-gcm"
+    key_rotation_enabled: true
+    key_rotation_interval: 90  # days
+    master_key_path: "/app/keys/master.key"
+    
+  # Compliance Settings
+  compliance:
+    soc2:
+      enabled: true
+      reporting_schedule: "monthly"
+      recipients:
+        - "compliance@example.com"
+        - "security@example.com"
+    
+    iso27001:
+      enabled: true
+      risk_assessment_interval: 90  # days
+      
+    pci_dss:
+      enabled: false
+      
+  # Performance Settings
+  performance:
+    connection_pooling:
+      enabled: true
+      pool_size: 50
+      max_overflow: 100
+      
+    caching:
+      enabled: true
+      levels:
+        - "memory"
+        - "redis"
+        - "database"
+      
+    async_operations:
+      enabled: true
+      max_concurrent: 100
+      
+    request_timeout: 300  # 5 minutes
+    
+  # Logging Configuration
+  logging:
+    level: "INFO"
+    format: "json"
+    handlers:
+      - type: "console"
+        level: "INFO"
+      - type: "file"
+        level: "DEBUG"
+        path: "/app/logs/server.log"
+        rotation: "daily"
+        retention: 30
+      - type: "syslog"
+        level: "WARNING"
+        server: "syslog.example.com:514"

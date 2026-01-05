@@ -16,7 +16,54 @@ __author__ = "uldyssian-sh"
 __license__ = "MIT"
 __description__ = "VMware vCenter MCP Server - Enterprise virtualization management via MCP"
 
+# Core MCP Server
 from .server import VCenterMCPServer
+
+# Enterprise Server
+from .enterprise_server import EnterpriseServer, EnterpriseConfig, create_server_from_config
+
+# Core Architecture Components
+from .core import (
+    # Authentication & Authorization
+    AuthenticationManager,
+    AuthorizationManager,
+    RBACManager,
+    
+    # Multi-tenancy
+    TenantManager,
+    TenantIsolationManager,
+    
+    # Data Layer
+    DatabaseManager,
+    ConnectionPoolManager,
+    CacheManager,
+    DistributedCacheManager,
+    
+    # Monitoring & Observability
+    MetricsCollector,
+    HealthCheckManager,
+    AuditLogger,
+    
+    # High Availability
+    HighAvailabilityManager,
+    LoadBalancerManager,
+    
+    # Security & Compliance
+    SecurityManager,
+    EncryptionManager,
+    ComplianceManager,
+    
+    # Orchestration
+    OrchestrationEngine,
+    WorkflowManager,
+    
+    # API Management
+    APIGateway,
+    RateLimitManager,
+    RequestValidator
+)
+
+# Exceptions
 from .exceptions import (
     VCenterConnectionError,
     VCenterAuthenticationError,
@@ -27,13 +74,61 @@ from .exceptions import (
 )
 
 __all__ = [
+    # Core MCP Server
     "VCenterMCPServer",
+    
+    # Enterprise Server
+    "EnterpriseServer",
+    "EnterpriseConfig",
+    "create_server_from_config",
+    
+    # Authentication & Authorization
+    "AuthenticationManager",
+    "AuthorizationManager",
+    "RBACManager",
+    
+    # Multi-tenancy
+    "TenantManager",
+    "TenantIsolationManager",
+    
+    # Data Layer
+    "DatabaseManager",
+    "ConnectionPoolManager",
+    "CacheManager",
+    "DistributedCacheManager",
+    
+    # Monitoring & Observability
+    "MetricsCollector",
+    "HealthCheckManager",
+    "AuditLogger",
+    
+    # High Availability
+    "HighAvailabilityManager",
+    "LoadBalancerManager",
+    
+    # Security & Compliance
+    "SecurityManager",
+    "EncryptionManager",
+    "ComplianceManager",
+    
+    # Orchestration
+    "OrchestrationEngine",
+    "WorkflowManager",
+    
+    # API Management
+    "APIGateway",
+    "RateLimitManager",
+    "RequestValidator",
+    
+    # Exceptions
     "VCenterConnectionError",
     "VCenterAuthenticationError", 
     "VCenterOperationError",
     "ValidationError",
     "ClusterOperationError",
     "DatacenterOperationError",
+    
+    # Metadata
     "__version__",
     "__author__",
     "__license__",
