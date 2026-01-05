@@ -295,9 +295,9 @@ class SecurityManager:
         return validation_result
     
     async def _check_ip_security(self, client_ip: str) -> Dict[str, Any]:
-        """Check IP security"""
+        """Check IP security with IPv4 and IPv6 support"""
         try:
-            ip_addr = ipaddress.IPv4Address(client_ip)
+            ip_addr = ipaddress.ip_address(client_ip)  # Supports both IPv4 and IPv6
             
             # Check blocked IPs
             if client_ip in self.blocked_ips:
@@ -308,24 +308,47 @@ class SecurityManager:
                 if ip_addr in network:
                     return {"allowed": False, "reason": f"IP in blocked network {network}"}
             
+            # Check IPv6 blocked networks if applicable
+            if isinstance(ip_addr, ipaddress.IPv6Address):
+                blocked_ipv6_networks = getattr(self, 'blocked_ipv6_networks', [])
+                for network in blocked_ipv6_networks:
+                    if ip_addr in network:
+                        return {"allowed": False, "reason": f"IPv6 in blocked network {network}"}
+            
             # Check allowed networks (if configured)
             if self.allowed_networks:
                 for network in self.allowed_networks:
                     if ip_addr in network:
                         return {"allowed": True, "reason": "IP in allowed network"}
                 
+                # Check IPv6 allowed networks if applicable
+                if isinstance(ip_addr, ipaddress.IPv6Address):
+                    allowed_ipv6_networks = getattr(self, 'allowed_ipv6_networks', [])
+                    for network in allowed_ipv6_networks:
+                        if ip_addr in network:
+                            return {"allowed": True, "reason": "IPv6 in allowed network"}
+                
                 return {"allowed": False, "reason": "IP not in allowed networks"}
             
             return {"allowed": True, "reason": "IP check passed"}
             
         except ValueError:
-            return {"allowed": False, "reason": "Invalid IP address"}
+            return {"allowed": False, "reason": "Invalid IP address format"}
     
     async def _check_rate_limits(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Check rate limits"""
+        """Check rate limits with enhanced security"""
         client_ip = request_data.get("client_ip", "unknown")
         user_id = request_data.get("user_id")
         tenant_id = request_data.get("tenant_id")
+        user_type = request_data.get("user_type", "anonymous")
+        
+        # Define rate limits based on user type
+        rate_limits = {
+            "anonymous": 10,      # Unauthenticated users
+            "authenticated": 50,  # Authenticated users
+            "admin": 200,         # Administrators
+            "system": 1000        # System accounts
+        }
         
         # Check different rate limit scopes
         scopes = [
@@ -341,7 +364,8 @@ class SecurityManager:
             if scope not in self.rate_limits:
                 self.rate_limits[scope] = {
                     "requests": [],
-                    "blocked_until": None
+                    "blocked_until": None,
+                    "violation_count": 0
                 }
             
             rate_limit = self.rate_limits[scope]
@@ -349,7 +373,7 @@ class SecurityManager:
             
             # Check if currently blocked
             if rate_limit["blocked_until"] and now < rate_limit["blocked_until"]:
-                return {"allowed": False, "scope": scope}
+                return {"allowed": False, "scope": scope, "reason": "Rate limit exceeded"}
             
             # Clean old requests (last hour)
             cutoff = now - timedelta(hours=1)
@@ -361,15 +385,36 @@ class SecurityManager:
             # Add current request
             rate_limit["requests"].append(now)
             
-            # Check limits
+            # Check limits based on user type
             requests_per_minute = len([
                 req_time for req_time in rate_limit["requests"]
                 if req_time > now - timedelta(minutes=1)
             ])
             
-            if requests_per_minute > 100:  # Configurable limit
-                rate_limit["blocked_until"] = now + timedelta(minutes=15)
-                return {"allowed": False, "scope": scope}
+            limit = rate_limits.get(user_type, 10)
+            
+            if requests_per_minute > limit:
+                # Progressive blocking - longer blocks for repeat offenders
+                violation_count = rate_limit["violation_count"] + 1
+                rate_limit["violation_count"] = violation_count
+                
+                # Calculate block duration (exponential backoff)
+                block_duration = min(60 * (2 ** violation_count), 3600)  # Max 1 hour
+                rate_limit["blocked_until"] = now + timedelta(seconds=block_duration)
+                
+                # Log security incident for high violation counts
+                if violation_count >= 3:
+                    await self._create_security_incident(
+                        title=f"Repeated rate limit violations from {scope}",
+                        description=f"Rate limit exceeded {violation_count} times",
+                        threat_level=ThreatLevel.HIGH,
+                        category="rate_limiting",
+                        source_ip=client_ip,
+                        source_user=user_id,
+                        evidence={"scope": scope, "violation_count": violation_count}
+                    )
+                
+                return {"allowed": False, "scope": scope, "reason": "Rate limit exceeded"}
         
         return {"allowed": True}
     
@@ -459,7 +504,14 @@ class SecurityManager:
         logger.warning("Security incident created", 
                       incident_id=incident.id,
                       title=title,
-                      threat_level=threat_level.value)
+                      threat_level=threat_level.value,
+                      source_ip=kwargs.get('source_ip'),
+                      source_user=kwargs.get('source_user'),
+                      target_resource=kwargs.get('target_resource'),
+                      detection_method=incident.detection_method,
+                      timestamp=incident.detection_time.isoformat(),
+                      compliance_tags=["soc2", "iso27001", "gdpr"],
+                      audit_trail=True)
         
         return incident
     
@@ -670,15 +722,63 @@ class EncryptionManager:
     
     async def _encrypt_chacha20(self, data: bytes, key_id: Optional[str] = None) -> Dict[str, Any]:
         """Encrypt using ChaCha20-Poly1305"""
-        # Implementation for ChaCha20-Poly1305
-        # This is a simplified placeholder
-        raise NotImplementedError("ChaCha20-Poly1305 encryption not implemented")
+        from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
+        
+        key = await self._get_or_create_chacha20_key(key_id)
+        
+        # Generate random nonce (12 bytes for ChaCha20Poly1305)
+        nonce = secrets.token_bytes(12)
+        
+        # Create cipher
+        cipher = ChaCha20Poly1305(key.key_data)
+        
+        # Encrypt data (includes authentication tag)
+        ciphertext = cipher.encrypt(nonce, data, None)
+        
+        return {
+            "algorithm": EncryptionAlgorithm.CHACHA20_POLY1305.value,
+            "key_id": key.id,
+            "nonce": base64.b64encode(nonce).decode("utf-8"),
+            "ciphertext": base64.b64encode(ciphertext).decode("utf-8"),
+            "encrypted_at": datetime.utcnow().isoformat()
+        }
     
     async def _decrypt_chacha20(self, encrypted_data: Dict[str, Any]) -> bytes:
         """Decrypt using ChaCha20-Poly1305"""
-        # Implementation for ChaCha20-Poly1305
-        # This is a simplified placeholder
-        raise NotImplementedError("ChaCha20-Poly1305 decryption not implemented")
+        from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
+        
+        key = self.keys[encrypted_data["key_id"]]
+        
+        nonce = base64.b64decode(encrypted_data["nonce"])
+        ciphertext = base64.b64decode(encrypted_data["ciphertext"])
+        
+        # Create cipher
+        cipher = ChaCha20Poly1305(key.key_data)
+        
+        # Decrypt data (automatically verifies authentication tag)
+        plaintext = cipher.decrypt(nonce, ciphertext, None)
+        
+        return plaintext
+    
+    async def _get_or_create_chacha20_key(self, key_id: Optional[str] = None) -> EncryptionKey:
+        """Get existing ChaCha20 key or create new one"""
+        if key_id and key_id in self.keys:
+            return self.keys[key_id]
+        
+        # Generate 32-byte key for ChaCha20
+        key_data = secrets.token_bytes(32)
+        
+        key = EncryptionKey(
+            id=key_id or str(uuid.uuid4()),
+            algorithm=EncryptionAlgorithm.CHACHA20_POLY1305,
+            key_data=key_data,
+            created_at=datetime.utcnow()
+        )
+        
+        self.keys[key.id] = key
+        logger.info("ChaCha20 encryption key created", key_id=key.id)
+        
+        return key
     
     async def _get_or_create_key(self, algorithm: EncryptionAlgorithm, 
                                 key_id: Optional[str] = None) -> EncryptionKey:

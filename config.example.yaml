@@ -3,8 +3,8 @@
 
 # vCenter Server Configuration
 vcenter:
-  host: "vcenter.example.com"
-  username: "administrator@vsphere.local"
+  host: "${VCENTER_HOST}"
+  username: "${VCENTER_USERNAME}"
   password: "${VCENTER_PASSWORD}"  # Use environment variable
   port: 443
   ssl_verify: true
