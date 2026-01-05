@@ -1,0 +1,224 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vmware-vcenter-mcp"
+version = "1.0.0"
+authors = [
+    {name = "uldyssian-sh", email = "25517637+uldyssian-sh@users.noreply.github.com"},
+]
+description = "Enterprise-grade Model Context Protocol (MCP) server for comprehensive VMware vCenter Server management"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Clustering",
+    "Topic :: System :: Distributed Computing",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Environment :: No Input/Output (Daemon)",
+]
+keywords = [
+    "vmware", "vcenter", "vsphere", "mcp", "model-context-protocol", 
+    "virtualization", "datacenter", "cluster-management", "automation", 
+    "enterprise", "infrastructure", "cloud"
+]
+dependencies = [
+    "mcp>=1.0.0",
+    "pydantic>=2.0.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.20.0",
+    "pyvmomi>=8.0.0",
+    "vsphere-automation-sdk-python>=1.80.0",
+    "vapi-client-bindings>=4.1.0",
+    "vapi-runtime>=2.40.0",
+    "cryptography>=40.0.0",
+    "python-jose>=3.3.0",
+    "passlib>=1.7.4",
+    "ldap3>=2.9.0",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0.0",
+    "structlog>=23.0.0",
+    "loguru>=0.7.0",
+    "aiofiles>=23.0.0",
+    "asyncio-throttle>=1.0.0",
+    "cachetools>=5.0.0",
+    "redis>=4.5.0",
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.10.0",
+    "prometheus-client>=0.16.0",
+    "psutil>=5.9.0",
+    "grafana-api>=1.0.0",
+    "celery>=5.3.0",
+    "kombu>=5.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "pytest-benchmark>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "pylint>=2.17.0",
+    "bandit>=1.7.0",
+    "safety>=2.0.0",
+    "pre-commit>=3.0.0",
+]
+docs = [
+    "sphinx>=6.0.0",
+    "sphinx-rtd-theme>=1.2.0",
+    "myst-parser>=1.0.0",
+    "sphinx-autodoc-typehints>=1.23.0",
+]
+monitoring = [
+    "prometheus-client>=0.16.0",
+    "grafana-api>=1.0.0",
+    "psutil>=5.9.0",
+]
+enterprise = [
+    "ldap3>=2.9.0",
+    "cryptography>=40.0.0",
+    "redis>=4.5.0",
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/uldyssian-sh/vmware-vcenter-mcp"
+Documentation = "https://github.com/uldyssian-sh/vmware-vcenter-mcp/blob/main/README.md"
+Repository = "https://github.com/uldyssian-sh/vmware-vcenter-mcp"
+"Bug Reports" = "https://github.com/uldyssian-sh/vmware-vcenter-mcp/issues"
+Changelog = "https://github.com/uldyssian-sh/vmware-vcenter-mcp/blob/main/CHANGELOG.md"
+Security = "https://github.com/uldyssian-sh/vmware-vcenter-mcp/blob/main/SECURITY.md"
+
+[project.scripts]
+vmware-vcenter-mcp = "vmware_vcenter_mcp.cli:main"
+vcenter-mcp-server = "vmware_vcenter_mcp.server:main"
+vcenter-mcp-admin = "vmware_vcenter_mcp.admin:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+vmware_vcenter_mcp = [
+    "config/*.yaml", 
+    "templates/*.json", 
+    "schemas/*.json",
+    "migrations/*.sql",
+    "static/*"
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | migrations
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["vmware_vcenter_mcp"]
+known_third_party = ["pyvmomi", "vsphere", "vapi"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "pyvmomi.*",
+    "pyVim.*",
+    "vsphere.*",
+    "vapi.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "enterprise: marks tests as enterprise feature tests",
+    "performance: marks tests as performance tests",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/tests/*", "*/test_*.py", "*/migrations/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests", "build", "dist", "migrations"]
+skips = ["B101", "B601"]
+
+[tool.pylint.messages_control]
+disable = [
+    "missing-docstring",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-instance-attributes",
+    "import-error",
+]
+
+[tool.pylint.format]
+max-line-length = 88
