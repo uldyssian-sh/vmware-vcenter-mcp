@@ -24,7 +24,7 @@ from .core import (
     TenantManager, TenantIsolationManager,
     DatabaseManager, ConnectionPoolManager, CacheManager, DistributedCacheManager,
     MetricsCollector, HealthCheckManager, AuditLogger,
-    HighAvailabilityManager, LoadBalancerManager, LoadBalancerConfig,
+    HighAvailabilityManager, LoadBalancerManager,
     SecurityManager, EncryptionManager, ComplianceManager,
     OrchestrationEngine, WorkflowManager,
     APIGateway, RateLimitManager, RequestValidator
@@ -85,7 +85,7 @@ class EnterpriseConfig:
     # Compliance
     compliance_standards: List[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.compliance_standards is None:
             self.compliance_standards = ["soc2", "iso27001"]
 
@@ -126,7 +126,7 @@ class EnterpriseServer:
         logger.info("Enterprise server initialized", 
                    host=config.host, port=config.port)
     
-    async def start(self):
+    async def start(self) -> None:
         """Start enterprise server"""
         if self.running:
             logger.warning("Server is already running")
@@ -158,7 +158,7 @@ class EnterpriseServer:
             await self.stop()
             raise
     
-    async def _initialize_core_components(self):
+    async def _initialize_core_components(self) -> None:
         """Initialize core architecture components"""
         
         # Database Manager
@@ -314,6 +314,7 @@ class EnterpriseServer:
             await self.ha_manager.initialize()
             
             # Load Balancer Manager
+            from .core.ha import LoadBalancerConfig
             lb_config = LoadBalancerConfig()
             self.load_balancer_manager = LoadBalancerManager(lb_config, self.ha_manager)
             
@@ -355,7 +356,7 @@ class EnterpriseServer:
             
             logger.info("API Gateway initialized")
     
-    async def _initialize_mcp_server(self):
+    async def _initialize_mcp_server(self) -> None:
         """Initialize MCP server"""
         
         # Create MCP server configuration
@@ -380,7 +381,7 @@ class EnterpriseServer:
         
         logger.info("MCP server initialized")
     
-    async def _start_services(self):
+    async def _start_services(self) -> None:
         """Start all services"""
         
         # Start MCP server
@@ -389,7 +390,7 @@ class EnterpriseServer:
         
         logger.info("All services started")
     
-    async def _register_health_checks(self):
+    async def _register_health_checks(self) -> None:
         """Register core health checks"""
         if not self.health_check_manager:
             return
@@ -398,10 +399,11 @@ class EnterpriseServer:
         
         # Database health check
         if self.database_manager:
-            async def check_database():
+            async def check_database() -> Dict[str, str]:
                 try:
-                    async with self.database_manager.get_session() as session:
-                        await session.execute("SELECT 1")
+                    if self.database_manager:
+                        async with self.database_manager.get_session() as session:
+                            await session.execute("SELECT 1")  # type: ignore
                     return {"message": "Database connection healthy"}
                 except Exception as e:
                     raise Exception(f"Database connection failed: {str(e)}")
@@ -419,14 +421,15 @@ class EnterpriseServer:
         
         # Cache health check
         if self.cache_manager:
-            async def check_cache():
+            async def check_cache() -> Dict[str, str]:
                 try:
-                    test_key = "health_check_test"
-                    await self.cache_manager.set(test_key, "test_value", 10)
-                    value = await self.cache_manager.get(test_key)
-                    if value != "test_value":
-                        raise Exception("Cache read/write test failed")
-                    await self.cache_manager.delete(test_key)
+                    if self.cache_manager:
+                        test_key = "health_check_test"
+                        await self.cache_manager.set(test_key, "test_value", 10)
+                        value = await self.cache_manager.get(test_key)
+                        if value != "test_value":
+                            raise Exception("Cache read/write test failed")
+                        await self.cache_manager.delete(test_key)
                     return {"message": "Cache connection healthy"}
                 except Exception as e:
                     raise Exception(f"Cache connection failed: {str(e)}")
@@ -443,7 +446,7 @@ class EnterpriseServer:
             self.health_check_manager.register_health_check(cache_health_check)
         
         # vCenter health check
-        async def check_vcenter():
+        async def check_vcenter() -> Dict[str, str]:
             try:
                 if self.mcp_server and hasattr(self.mcp_server, 'vcenter_client'):
                     # Test vCenter connection
@@ -465,17 +468,17 @@ class EnterpriseServer:
         
         self.health_check_manager.register_health_check(vcenter_health_check)
     
-    def _setup_signal_handlers(self):
+    def _setup_signal_handlers(self) -> None:
         """Setup signal handlers for graceful shutdown"""
         
-        def signal_handler(signum, frame):
+        def signal_handler(signum: int, frame: Any) -> None:
             logger.info("Received shutdown signal", signal=signum)
             asyncio.create_task(self.stop())
         
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
     
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop enterprise server"""
         if not self.running:
             return
@@ -616,7 +619,7 @@ async def create_server_from_config(config_path: str) -> EnterpriseServer:
     return EnterpriseServer(config)
 
 
-async def main():
+async def main() -> None:
     """Main entry point"""
     
     # Setup logging

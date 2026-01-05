@@ -13,12 +13,13 @@ import logging
 import os
 import sys
 from pathlib import Path
+from typing import Optional
 
 from .server import VCenterMCPServer
 from .enterprise_server import EnterpriseServer, create_server_from_config
 
 
-def setup_logging(level: str = "INFO"):
+def setup_logging(level: str = "INFO") -> None:
     """Setup logging configuration"""
     logging.basicConfig(
         level=getattr(logging, level.upper()),
@@ -30,7 +31,7 @@ def setup_logging(level: str = "INFO"):
     )
 
 
-async def run_basic_server(config_file: str = None):
+async def run_basic_server(config_file: Optional[str] = None) -> None:
     """Run basic MCP server"""
     import yaml
     
@@ -65,7 +66,7 @@ async def run_basic_server(config_file: str = None):
     await server.start()
 
 
-async def run_enterprise_server(config_file: str):
+async def run_enterprise_server(config_file: str) -> None:
     """Run enterprise server"""
     if not os.path.exists(config_file):
         print(f"Error: Configuration file {config_file} not found.")
@@ -79,7 +80,7 @@ async def run_enterprise_server(config_file: str):
         sys.exit(1)
 
 
-def main():
+def main() -> None:
     """Main entry point"""
     parser = argparse.ArgumentParser(
         description="VMware vCenter MCP Server",

@@ -109,7 +109,7 @@ class VCenterClient:
         """Check if connected to vCenter"""
         return self._connected and self.service_instance is not None
     
-    def get_obj(self, vimtype, name: str = None):
+    def get_obj(self, vimtype: Any, name: Optional[str] = None) -> Any:
         """Get vSphere object by type and name"""
         if not self.content:
             raise VCenterConnectionError("Not connected to vCenter")
@@ -129,11 +129,11 @@ class VCenterClient:
         finally:
             container.Destroy()
     
-    def get_all_objs(self, vimtype):
+    def get_all_objs(self, vimtype: Any) -> Any:
         """Get all objects of specified type"""
         return self.get_obj(vimtype)
     
-    async def wait_for_task(self, task):
+    async def wait_for_task(self, task: Any) -> Any:
         """Wait for vCenter task completion"""
         try:
             result = WaitForTask(task)
@@ -166,7 +166,7 @@ class VCenterMCPServer:
         
         logger.info("VMware vCenter MCP Server initialized")
     
-    def _register_handlers(self):
+    def _register_handlers(self) -> None:
         """Register MCP protocol handlers"""
         
         @self.server.list_tools()
@@ -758,7 +758,7 @@ class VCenterMCPServer:
         except Exception as e:
             raise VCenterOperationError(f"Failed to get performance stats: {str(e)}")
     
-    async def start(self):
+    async def start(self) -> None:
         """Start the MCP server"""
         try:
             # Connect to vCenter
@@ -784,13 +784,13 @@ class VCenterMCPServer:
         finally:
             await self.vcenter_client.disconnect()
     
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop the MCP server"""
         await self.vcenter_client.disconnect()
         logger.info("VMware vCenter MCP Server stopped")
 
 
-async def main():
+async def main() -> None:
     """Main entry point"""
     import os
     import yaml
