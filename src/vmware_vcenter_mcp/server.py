@@ -357,7 +357,7 @@ class VCenterMCPServer:
                     "name": datacenter.name,
                     "moid": datacenter._moId
                 },
-                "message": f"Datacenter "{name}" created successfully"
+                "message": f"Datacenter '{name}' created successfully"
             }
             
         except Exception as e:
@@ -397,7 +397,7 @@ class VCenterMCPServer:
             # Get datacenter
             datacenter = self.vcenter_client.get_obj(vim.Datacenter, datacenter_name)
             if not datacenter:
-                raise ResourceNotFoundError(f"Datacenter "{datacenter_name}" not found")
+                raise ResourceNotFoundError(f"Datacenter '{datacenter_name}' not found")
             
             # Create cluster spec
             cluster_spec = vim.cluster.ConfigSpecEx()
@@ -418,7 +418,7 @@ class VCenterMCPServer:
                     "moid": cluster._moId,
                     "datacenter": datacenter_name
                 },
-                "message": f"Cluster "{name}" created successfully"
+                "message": f"Cluster '{name}' created successfully"
             }
             
         except Exception as e:
@@ -519,14 +519,14 @@ class VCenterMCPServer:
             # Get datacenter
             datacenter = self.vcenter_client.get_obj(vim.Datacenter, datacenter_name)
             if not datacenter:
-                raise ResourceNotFoundError(f"Datacenter "{datacenter_name}" not found")
+                raise ResourceNotFoundError(f"Datacenter '{datacenter_name}' not found")
             
             # Get cluster or use first available
             cluster_name = args.get("cluster")
             if cluster_name:
                 cluster = self.vcenter_client.get_obj(vim.ClusterComputeResource, cluster_name)
                 if not cluster:
-                    raise ResourceNotFoundError(f"Cluster "{cluster_name}" not found")
+                    raise ResourceNotFoundError(f"Cluster '{cluster_name}' not found")
                 resource_pool = cluster.resourcePool
             else:
                 clusters = self.vcenter_client.get_all_objs(vim.ClusterComputeResource)
@@ -539,7 +539,7 @@ class VCenterMCPServer:
             if datastore_name:
                 datastore = self.vcenter_client.get_obj(vim.Datastore, datastore_name)
                 if not datastore:
-                    raise ResourceNotFoundError(f"Datastore "{datastore_name}" not found")
+                    raise ResourceNotFoundError(f"Datastore '{datastore_name}' not found")
             else:
                 datastores = self.vcenter_client.get_all_objs(vim.Datastore)
                 if not datastores:
@@ -582,7 +582,7 @@ class VCenterMCPServer:
                     "moid": result._moId,
                     "datacenter": datacenter_name
                 },
-                "message": f"VM "{name}" created successfully"
+                "message": f"VM '{name}' created successfully"
             }
             
         except Exception as e:
@@ -599,7 +599,7 @@ class VCenterMCPServer:
         try:
             vm = self.vcenter_client.get_obj(vim.VirtualMachine, vm_name)
             if not vm:
-                raise ResourceNotFoundError(f"VM "{vm_name}" not found")
+                raise ResourceNotFoundError(f"VM '{vm_name}' not found")
             
             if action == "on":
                 task = vm.PowerOnVM_Task()
@@ -618,7 +618,7 @@ class VCenterMCPServer:
                 "success": True,
                 "vm": vm_name,
                 "action": action,
-                "message": f"VM "{vm_name}" power {action} completed successfully"
+                "message": f"VM '{vm_name}' power {action} completed successfully"
             }
             
         except Exception as e:
@@ -634,7 +634,7 @@ class VCenterMCPServer:
         try:
             vm = self.vcenter_client.get_obj(vim.VirtualMachine, vm_name)
             if not vm:
-                raise ResourceNotFoundError(f"VM "{vm_name}" not found")
+                raise ResourceNotFoundError(f"VM '{vm_name}' not found")
             
             vm_info = {
                 "name": vm.name,
@@ -717,7 +717,7 @@ class VCenterMCPServer:
                 raise ValidationError(f"Invalid entity type: {entity_type}")
             
             if not entity:
-                raise ResourceNotFoundError(f"{entity_type.title()} "{entity_name}" not found")
+                raise ResourceNotFoundError(f"{entity_type.title()} '{entity_name}' not found")
             
             # Get basic performance info
             perf_info = {
