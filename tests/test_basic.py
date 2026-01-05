@@ -115,5 +115,76 @@ class TestSecurityModules(unittest.TestCase):
             self.fail(f"Failed to create GDPRComplianceManager: {e}")
 
 
+class TestEnterpriseSecurityModules(unittest.TestCase):
+    """Test enterprise security modules"""
+    
+    def test_secrets_manager_instantiation(self):
+        """Test EnterpriseSecretsManager can be instantiated"""
+        try:
+            from vmware_vcenter_mcp.secrets_manager import (
+                EnterpriseSecretsManager, SecretConfig, SecretBackend
+            )
+            config = SecretConfig(backend=SecretBackend.MEMORY)
+            manager = EnterpriseSecretsManager(config)
+            self.assertIsNotNone(manager)
+            self.assertEqual(manager.backend, SecretBackend.MEMORY)
+        except Exception as e:
+            self.fail(f"Failed to create EnterpriseSecretsManager: {e}")
+    
+    def test_config_protection_instantiation(self):
+        """Test ConfigProtectionManager can be instantiated"""
+        try:
+            from vmware_vcenter_mcp.config_protection import (
+                ConfigProtectionManager, ConfigProtectionSettings
+            )
+            import tempfile
+            
+            with tempfile.NamedTemporaryFile(suffix='.json', delete=False) as f:
+                config_path = f.name
+            
+            settings = ConfigProtectionSettings(encrypt_sensitive_fields=False)
+            manager = ConfigProtectionManager(config_path, settings)
+            self.assertIsNotNone(manager)
+            
+            # Cleanup
+            import os
+            if os.path.exists(config_path):
+                os.unlink(config_path)
+                
+        except Exception as e:
+            self.fail(f"Failed to create ConfigProtectionManager: {e}")
+    
+    def test_secrets_manager_memory_operations(self):
+        """Test basic secrets manager operations with memory backend"""
+        try:
+            from vmware_vcenter_mcp.secrets_manager import (
+                EnterpriseSecretsManager, SecretConfig, SecretBackend
+            )
+            
+            config = SecretConfig(backend=SecretBackend.MEMORY)
+            manager = EnterpriseSecretsManager(config)
+            
+            # Test store and retrieve
+            test_key = "test_secret"
+            test_value = "test_value_123"
+            
+            success = manager.store_secret(test_key, test_value)
+            self.assertTrue(success)
+            
+            retrieved_value = manager.retrieve_secret(test_key)
+            self.assertEqual(retrieved_value, test_value)
+            
+            # Test delete
+            success = manager.delete_secret(test_key)
+            self.assertTrue(success)
+            
+            # Verify deletion
+            retrieved_value = manager.retrieve_secret(test_key)
+            self.assertIsNone(retrieved_value)
+            
+        except Exception as e:
+            self.fail(f"Failed secrets manager operations: {e}")
+
+
 if __name__ == '__main__':
     unittest.main()
