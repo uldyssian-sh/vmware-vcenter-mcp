@@ -14,7 +14,7 @@ vcenter:
 # MCP Server Configuration
 mcp:
   server_name: "vmware-vcenter-mcp"
-  version: "1.0.0"
+  version: "1.5.0"
   
 # Logging Configuration
 logging:

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vmware-vcenter-mcp"
-version = "1.0.0"
+version = "1.5.0"
 authors = [
     {name = "uldyssian-sh", email = "25517637+uldyssian-sh@users.noreply.github.com"},
 ]
@@ -37,33 +37,11 @@ keywords = [
     "enterprise", "infrastructure", "cloud"
 ]
 dependencies = [
-    "mcp>=1.0.0",
-    "pydantic>=2.0.0",
-    "fastapi>=0.100.0",
-    "uvicorn>=0.20.0",
-    "pyvmomi>=8.0.0",
-    "vsphere-automation-sdk-python>=1.80.0",
-    "vapi-client-bindings>=4.1.0",
-    "vapi-runtime>=2.40.0",
-    "cryptography>=40.0.0",
-    "python-jose>=3.3.0",
-    "passlib>=1.7.4",
-    "ldap3>=2.9.0",
     "pyyaml>=6.0",
     "python-dotenv>=1.0.0",
-    "structlog>=23.0.0",
-    "loguru>=0.7.0",
-    "aiofiles>=23.0.0",
-    "asyncio-throttle>=1.0.0",
-    "cachetools>=5.0.0",
-    "redis>=4.5.0",
-    "sqlalchemy>=2.0.0",
-    "alembic>=1.10.0",
-    "prometheus-client>=0.16.0",
-    "psutil>=5.9.0",
-    "grafana-api>=1.0.0",
-    "celery>=5.3.0",
-    "kombu>=5.3.0",
+    "requests>=2.28.0",
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
 ]
 
 [project.optional-dependencies]

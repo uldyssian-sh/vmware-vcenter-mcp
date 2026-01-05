@@ -8,10 +8,10 @@ enterprise-scale operations management.
 
 Author: uldyssian-sh
 License: MIT
-Version: 1.0.0
+Version: 1.5.0
 """
 
-__version__ = "1.0.0"
+__version__ = "1.5.0"
 __author__ = "uldyssian-sh"
 __license__ = "MIT"
 __description__ = "VMware vCenter MCP Server - Enterprise virtualization management via MCP"
